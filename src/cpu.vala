@@ -266,9 +266,9 @@ class CPU : GLib.Object {
 
 void main(){
 	var c = new CPU();
-	c.load_from_file("prgm.bin");
+	c.load_from_file("bin/prgm.asm.bin");
+	print("Hello");
 	c.start();
-	print("HELLO");
 	var loop = new MainLoop();
 	loop.run();
 }
