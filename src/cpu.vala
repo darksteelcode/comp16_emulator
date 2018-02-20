@@ -257,6 +257,7 @@ class CPU : GLib.Object {
         				addr++;
         			}
         		}
+        		return true;
 		} catch (FileError e) {
         		stderr.printf ("%s\n", e.message);
     		}
@@ -264,9 +265,15 @@ class CPU : GLib.Object {
 	}
 }
 
-void main(){
+void main(string[] args){
 	var c = new CPU();
-	c.load_from_file("bin/prgm.asm.bin");
+	if (args.length < 2){
+		print("Pass name of bin file to run after command\n");
+		return;
+	}
+	if(!c.load_from_file(args[1])){
+		return;
+	}
 	print("Hello");
 	c.start();
 	var loop = new MainLoop();
