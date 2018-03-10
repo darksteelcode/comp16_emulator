@@ -228,7 +228,7 @@ class CPU : GLib.Object {
 			clks += this.run_instr();
 			this.instr_end();
 			//yield;
-			if(clks%1000000 == 0){
+			if(clks>1000000){
 				if(debug){
 					yield this.debug(clks);
 				}
@@ -259,6 +259,7 @@ class CPU : GLib.Object {
         		}
         		return true;
 		} catch (FileError e) {
+			stderr.printf("ERROR");
         		stderr.printf ("%s\n", e.message);
     		}
     		return false;
@@ -274,7 +275,7 @@ void main(string[] args){
 	if(!c.load_from_file(args[1])){
 		return;
 	}
-	print("Hello");
+	print("Starting");
 	c.start();
 	var loop = new MainLoop();
 	loop.run();
