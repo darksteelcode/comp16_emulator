@@ -29,6 +29,9 @@ class CPU : GLib.Object {
 	public uint16 instr = 0;
 	int64 time = GLib.get_real_time();
 
+	//Txt Mem
+	public uint8[] port_txt_mem = new uint8[1024];
+
 	//Run ALU operation on A and B regs, and sets RES to result
 	void run_alu(){
 		uint16 a = this.regs[REGS.A];
@@ -193,11 +196,18 @@ class CPU : GLib.Object {
 		}
 		return this.INSTR_CLKS[op];
 	}
+	void handle_txt_mem(){
+		//If txt_mem_data port is written to
+		if(this.port_we[6]){
+			this.port_txt_mem[this.port_io[5]&0x1ff] = (uint8)this.port_io[6];
+		}
+	}
 	//Write to mem if we on mdr is true
 	void instr_end(){
 		if(this.we[REGS.MDR]){
 			this.ram[this.regs[REGS.MAR]] = this.regs[REGS.MAR];
 		}
+		this.handle_txt_mem();
 	}
 	//Run n instr's - don't debug
 	public void run(uint n){
@@ -211,10 +221,10 @@ class CPU : GLib.Object {
 	public async void debug(int64 clks){
 		print("\x1b[2J\x1b[H");
 		int64 dur = GLib.get_real_time() - time;
-		print("Speed: %f Mhz\nPort IO\n", ((double)clks)/((double)dur));
-		for(uint16 p = 0; p < 256; p++){
-			print("%04x ", this.port_io[p]);
-			if(p%16==15){
+		print("Speed: %f Mhz\n", ((double)clks)/((double)dur));
+		for(uint8 p = 0; p < 1000; p++){
+			print("%hhX", this.port_txt_mem[p]);
+			if(p%40==39){
 				print("\n");
 			}
 		}
@@ -227,8 +237,7 @@ class CPU : GLib.Object {
 			this.instr_setup();
 			clks += this.run_instr();
 			this.instr_end();
-			//yield;
-			if(clks>1000000){
+			if(clks>2000000){
 				if(debug){
 					yield this.debug(clks);
 				}
