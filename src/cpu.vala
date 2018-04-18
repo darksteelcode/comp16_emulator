@@ -198,8 +198,8 @@ class CPU : GLib.Object {
 	}
 	void handle_txt_mem(){
 		//If txt_mem_data port is written to
-		if(this.port_we[6]){
-			this.port_txt_mem[this.port_io[5]&0x1ff] = (uint8)this.port_io[6];
+		if(this.port_we[6] && this.port_io[5]<1000) {
+			this.port_txt_mem[this.port_io[5]] = (uint8)(this.port_io[6]&0x00ff);
 		}
 	}
 	//Write to mem if we on mdr is true
@@ -207,13 +207,13 @@ class CPU : GLib.Object {
 		if(this.we[REGS.MDR]){
 			this.ram[this.regs[REGS.MAR]] = this.regs[REGS.MAR];
 		}
-		this.handle_txt_mem();
 	}
 	//Run n instr's - don't debug
 	public void run(uint n){
 		for(ulong i = 0; i < n; i++){
 			this.instr_setup();
 			this.run_instr();
+			this.handle_txt_mem();
 			this.instr_end();
 		}
 	}
@@ -222,8 +222,8 @@ class CPU : GLib.Object {
 		print("\x1b[2J\x1b[H");
 		int64 dur = GLib.get_real_time() - time;
 		print("Speed: %f Mhz\n", ((double)clks)/((double)dur));
-		for(uint8 p = 0; p < 1000; p++){
-			print("%hhX", this.port_txt_mem[p]);
+		for(uint16 p = 0; p < 1000; p++){
+			print("%i", this.port_txt_mem[p]);
 			if(p%40==39){
 				print("\n");
 			}
