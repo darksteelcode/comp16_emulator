@@ -10,7 +10,6 @@ enum INSTR {
 NOP, MOV, JMP, JPC, PRA, PRB, LOD, STR, PSH, POP, SRT, RET, OUT, IN
 }
 
-
 class CPU : GLib.Object {
 	int64[] INSTR_CLKS =  {2, 2, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2};
 	//Main Memory
@@ -30,7 +29,7 @@ class CPU : GLib.Object {
 	int64 time = GLib.get_real_time();
 
 	//Txt Mem
-	public uint8[] port_txt_mem = new uint8[1024];
+	public uint8[] port_txt_mem = new uint8[1000];
 
 	//Run ALU operation on A and B regs, and sets RES to result
 	void run_alu(){
@@ -89,13 +88,13 @@ class CPU : GLib.Object {
 	}
 	//clear we
 	void clear_we(){
-		for(int i = 0; i < 16; i++){
+		for(uint16 i = 0; i < 16; i++){
 			this.we[i] = false;
 		}
 	}
 	//clear port_we
 	void clear_port_we(){
-		for(int i = 0; i < 256; i++){
+		for(uint16 i = 0; i < 256; i++){
 			this.port_we[i] = false;
 		}
 	}
@@ -105,6 +104,7 @@ class CPU : GLib.Object {
 		this.clear_port_we();
 		this.run_alu();
 		this.instr = this.ram[this.regs[REGS.PC]];
+		print("%04x\n",this.instr);
 		this.regs[REGS.PC] += 1;
 	}
 	//Returns the number of clk cycles the command takes.
@@ -113,7 +113,7 @@ class CPU : GLib.Object {
 		uint16 src = (this.instr & 0x0f00) >> 8;
 		uint16 dst = (this.instr & 0x00f0) >> 4;
 		uint8 alu_op = (uint8)(this.instr & 0x000f);
-		uint16 val = this.instr & 0x00ff;
+		uint8 val = (uint8)(this.instr & 0x00ff);
 		uint16 val12 = this.instr & 0x0fff;
 		switch (op){
 			case INSTR.NOP:
@@ -189,7 +189,7 @@ class CPU : GLib.Object {
 				break;
 			case INSTR.IN:
 				this.regs[src] = this.port_io[val];
-				this.we[src] = true;
+				this.we[src] = true;;
 				break;
 			default:
 				break;
@@ -199,11 +199,12 @@ class CPU : GLib.Object {
 	void handle_txt_mem(){
 		//If txt_mem_data port is written to
 		if(this.port_we[6] && this.port_io[5]<1000) {
-			this.port_txt_mem[this.port_io[5]] = (uint8)(this.port_io[6]&0x00ff);
+			this.port_txt_mem[this.port_io[5]] = (uint8)(this.port_io[6]&0x007f);
 		}
 	}
 	//Write to mem if we on mdr is true
 	void instr_end(){
+		this.handle_txt_mem();
 		if(this.we[REGS.MDR]){
 			this.ram[this.regs[REGS.MAR]] = this.regs[REGS.MAR];
 		}
@@ -213,19 +214,18 @@ class CPU : GLib.Object {
 		for(ulong i = 0; i < n; i++){
 			this.instr_setup();
 			this.run_instr();
-			this.handle_txt_mem();
 			this.instr_end();
 		}
 	}
 
 	public async void debug(int64 clks){
-		print("\x1b[2J\x1b[H");
+		//print("\x1b[2J\x1b[H");
 		int64 dur = GLib.get_real_time() - time;
-		print("Speed: %f Mhz\n", ((double)clks)/((double)dur));
+		//print("Speed: %f Mhz\n", ((double)clks)/((double)dur));
 		for(uint16 p = 0; p < 1000; p++){
-			print("%i", this.port_txt_mem[p]);
+			//print("%c", this.port_txt_mem[p]);
 			if(p%40==39){
-				print("\n");
+				//print("\n");
 			}
 		}
 		this.time = GLib.get_real_time();
@@ -255,6 +255,7 @@ class CPU : GLib.Object {
 			uint8[] read;
         		FileUtils.get_data (filename, out read);
         		if(read.length % 2 != 0){
+				print("File Length: %u", read.length);
         			print("Warning: File %s is not proper length for a comp16 binary. It will not be loaded.\n", filename);
         			return false;
         		}
