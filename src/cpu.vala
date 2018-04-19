@@ -55,7 +55,7 @@ class CPU : GLib.Object {
 				this.regs[REGS.RES] = a & b;
 				break;
 			case ALU_OPS.NOT:
-				this.regs[REGS.RES] = (uint16)(! (bool)a);
+				this.regs[REGS.RES] = (uint16)(! ((bool)a));
 				break;
 			case ALU_OPS.AND:
 				this.regs[REGS.RES] = (uint16)((bool)a && (bool)b);
@@ -100,11 +100,11 @@ class CPU : GLib.Object {
 	}
 	//run before each instr - run alu, increment pc, clear we and port_we, load instr from ram
 	void instr_setup(){
+		this.regs[REGS.MDR] = this.ram[this.regs[REGS.MAR]];
 		this.clear_we();
 		this.clear_port_we();
 		this.run_alu();
 		this.instr = this.ram[this.regs[REGS.PC]];
-		print("%04x\n",this.instr);
 		this.regs[REGS.PC] += 1;
 	}
 	//Returns the number of clk cycles the command takes.
@@ -130,7 +130,7 @@ class CPU : GLib.Object {
 				break;
 			case INSTR.JPC:
 				this.regs[src] = (this.regs[src] & 0xff00) + val;
-				if((bool)this.regs[REGS.CND]){
+				if(this.regs[REGS.CND] != 0){
 					this.regs[REGS.PC] = this.regs[src];
 				}
 				this.we[REGS.PC] = true;
@@ -219,13 +219,18 @@ class CPU : GLib.Object {
 	}
 
 	public async void debug(int64 clks){
-		//print("\x1b[2J\x1b[H");
+		print("\x1b[2J\x1b[H");
 		int64 dur = GLib.get_real_time() - time;
-		//print("Speed: %f Mhz\n", ((double)clks)/((double)dur));
+		print("Speed: %f Mhz\n", ((double)clks)/((double)dur));
 		for(uint16 p = 0; p < 1000; p++){
-			//print("%c", this.port_txt_mem[p]);
+			if(this.port_txt_mem[p] == 0){
+				print(" ");
+			}
+			else{
+				print("%c", this.port_txt_mem[p]);
+			}
 			if(p%40==39){
-				//print("\n");
+				print("\n");
 			}
 		}
 		this.time = GLib.get_real_time();
@@ -237,7 +242,7 @@ class CPU : GLib.Object {
 			this.instr_setup();
 			clks += this.run_instr();
 			this.instr_end();
-			if(clks>2000000){
+			if(clks>5000000){
 				if(debug){
 					yield this.debug(clks);
 				}
