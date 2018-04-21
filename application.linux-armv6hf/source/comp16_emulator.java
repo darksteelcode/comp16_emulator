@@ -3,6 +3,8 @@ import processing.data.*;
 import processing.event.*; 
 import processing.opengl.*; 
 
+import static javax.swing.JOptionPane.*; 
+
 import java.util.HashMap; 
 import java.util.ArrayList; 
 import java.io.File; 
@@ -366,9 +368,11 @@ public void drawControls(){
   rect(55, 205, 110, 20);
   rect(170, 205, 45, 20);
   rect(220, 205, 20, 20);
+  rect(245, 205, 70, 20);
   fill(0);
   text("Load Binary File", 60, 219);
   text("Reset", 177, 219);
+  text("Set Num", 265, 220);
   text("Status: " + (RUN_CPU?"Running":"Stoped"), 5, 242);
   text("Clock: " + String.format("%.02f", SPEED_MHZ)+ " Mhz", 5, 257);
   text("A " + hex(cpu.regs[0]) + " RES " + hex(cpu.regs[2]) + " MAR " + hex(cpu.regs[4]) + " CND " + hex(cpu.regs[6]), 120, 242);
@@ -381,6 +385,8 @@ public void drawControls(){
   triangle(9+215, 209, 9+215, 221, 21+215, 215);
   rect(19+215, 209, 2, 12);
   
+  triangle(9+240, 209, 9+240, 221, 21+240, 215);
+  rect(19+240, 209, 2, 12);
 }
 
 public void drawScreen(){
@@ -439,10 +445,18 @@ public void mouseClicked(){
       cpu.load_mem_from_file(FILE_PATH); 
     }
   }
-  //Step one cycle butotn
+  //Step one cycle button
   if(mbox(220, 205, 20, 20)){
     RUN_CPU = true;
     CYCLES_PER_FRAME = 1;
+  }
+  //Step 1000 cycles button
+  if(mbox(245, 205, 70, 20)){
+    final String cycles = showInputDialog("Enter Cycles Per Frame");
+    if(cycles != null){
+      RUN_CPU = true;
+      CYCLES_PER_FRAME = PApplet.parseInt(cycles);
+    }
   }
 }
 

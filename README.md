@@ -14,7 +14,7 @@ Run the emulator by typing the following in a terminal
 ```
 c16emu
 ```
-Use the start arrow and stop square to run and stop the emulator, use the "Load Binary File" button to choose a comp16 binary to run, and the "Reset" button to reset the currently loaded program.
+Use the start arrow and stop square to run and stop the emulator, use the "Load Binary File" button to choose a comp16 binary to run, and the "Reset" button to reset the currently loaded program. Use the blue arrow to run one cycle per frame, or use the "set Num" button with the blue arrow to set the number of cycles per frame.
 
 Note: Once you choose a binary file to run, you still have to press the green start arrow to start the emulator.
 
