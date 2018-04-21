@@ -1,6 +1,4 @@
-all: cpu
-cpu:	
-	valac --pkg=gio-2.0 -o bin/cpu src/cpu.vala -X -O3	
+all: install
 
-clean:
-	rm bin/*
+install:
+	sudo ln -sf `pwd`/application.linux64/comp16_emulator /usr/local/bin/c16emu
