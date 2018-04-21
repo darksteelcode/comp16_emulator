@@ -4,19 +4,9 @@ An emulator for [comp16](https://github.com/darksteelcode/comp16). It has comple
 ## Installation
 To download the emulator, the required tools to build software for comp16, and a sample of comp16 software, run the following:
 ```
-cd ~
 git clone https://github.com/darksteelcode/comp16_emulator
 cd comp16_emulator
 make install
-cd ..
-git clone https://github.com/darksteelcode/comp16_compilers
-cd comp16_compilers
-make install
-cd ..
-git clone https://github.com/darksteelcode/comp16_software
-cd comp16_software
-make
-cd ..
 ```
 
 ## Usage
