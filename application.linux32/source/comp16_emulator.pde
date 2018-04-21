@@ -5,7 +5,7 @@ CPU cpu;
 boolean RUN_CPU = false;
 
 //Number of cycles to run between updating output
-final static int CYCLES_PER_FRAME = 1000000;
+int CYCLES_PER_FRAME = 1000000;
 
 int TIME_START = 0;
 float SPEED_MHZ = 0;
@@ -296,6 +296,8 @@ class CPU {
     this.clear_we();
     this.clear_port_we();
     this.clear_gfx_txt_mem();
+    this.key_write_pos = 0;
+    this.key_read_pos = 0;
   }
   
   void load_mem(){
@@ -340,21 +342,29 @@ void drawControls(){
   textFont(ctrl_font);
   fill(255);
   rect(0,200,320,60);
+  fill(200);
+  rect(115, 230, 2, 27);
   fill(150);
   rect(5, 205, 20, 20);
   rect(30, 205, 20, 20);
   rect(55, 205, 110, 20);
   rect(170, 205, 45, 20);
+  rect(220, 205, 20, 20);
   fill(0);
-  text("Load Binary File", 60, 220);
-  text("Reset", 175, 220);
+  text("Load Binary File", 60, 219);
+  text("Reset", 177, 219);
   text("Status: " + (RUN_CPU?"Running":"Stoped"), 5, 242);
-  text("Clock Speed: " + String.format("%.02f", SPEED_MHZ)+ " Mhz", 5, 257);
-  text("PC: " + hex(cpu.regs[REGS.PC]), 130, 242);
+  text("Clock: " + String.format("%.02f", SPEED_MHZ)+ " Mhz", 5, 257);
+  text("A " + hex(cpu.regs[0]) + " RES " + hex(cpu.regs[2]) + " MAR " + hex(cpu.regs[4]) + " CND " + hex(cpu.regs[6]), 120, 242);
+  text("B " + hex(cpu.regs[1]) + "  PC " + hex(cpu.regs[3]) + " MDR " + hex(cpu.regs[5]) + "  BP " + hex(cpu.regs[7]), 120, 257);
   fill(0,255,0);
   triangle(9, 209, 9, 221, 21, 215);
   fill(255,0,0);
   rect(34,209,12,12);
+  fill(0,0,255);
+  triangle(9+215, 209, 9+215, 221, 21+215, 215);
+  rect(19+215, 209, 2, 12);
+  
 }
 
 void drawScreen(){
@@ -396,6 +406,7 @@ void mouseClicked(){
   //Run button
   if(mbox(5, 205, 20, 20)){
     RUN_CPU = true;
+    CYCLES_PER_FRAME = 1000000;
   }
   //Stop button
   if(mbox(30, 205, 20, 20)){
@@ -412,11 +423,16 @@ void mouseClicked(){
       cpu.load_mem_from_file(FILE_PATH); 
     }
   }
+  //Step one cycle butotn
+  if(mbox(220, 205, 20, 20)){
+    RUN_CPU = true;
+    CYCLES_PER_FRAME = 1;
+  }
 }
 
 void setup(){
   cpu = new CPU();
-  ctrl_font = createFont("Sans Serif", 12);
+  ctrl_font = createFont("Courier", 10);
   c16font = createFont("PxPlus_IBM_CGAthin.ttf", 8);
   noStroke();
   size(320, 260);
