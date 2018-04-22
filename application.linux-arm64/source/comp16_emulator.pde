@@ -3,6 +3,7 @@ import static javax.swing.JOptionPane.*;
 CPU cpu;
 
 boolean RUN_CPU = false;
+boolean STEP = false;
 
 //Number of cycles to run between updating output
 int CYCLES_PER_FRAME = 1000000;
@@ -341,40 +342,42 @@ void addKey(boolean release){
 void drawControls(){
   textFont(ctrl_font);
   fill(255);
-  rect(0,200,320,60);
+  rect(0,400,640,60);
   fill(200);
-  rect(115, 230, 2, 27);
+  rect(110, 430, 2, 27);
   fill(150);
-  rect(5, 205, 20, 20);
-  rect(30, 205, 20, 20);
-  rect(55, 205, 110, 20);
-  rect(170, 205, 45, 20);
-  rect(220, 205, 20, 20);
-  rect(245, 205, 70, 20);
+  rect(5, 405, 20, 20);
+  rect(30, 405, 20, 20);
+  rect(55, 405, 110, 20);
+  rect(170, 405, 45, 20);
+  rect(220, 405, 20, 20);
+  rect(245, 405, 70, 20);
   fill(0);
-  text("Load Binary File", 60, 219);
-  text("Reset", 177, 219);
-  text("Set Num", 265, 220);
-  text("Status: " + (RUN_CPU?"Running":"Stoped"), 5, 242);
-  text("Clock: " + String.format("%.02f", SPEED_MHZ)+ " Mhz", 5, 257);
-  text("A " + hex(cpu.regs[0]) + " RES " + hex(cpu.regs[2]) + " MAR " + hex(cpu.regs[4]) + " CND " + hex(cpu.regs[6]), 120, 242);
-  text("B " + hex(cpu.regs[1]) + "  PC " + hex(cpu.regs[3]) + " MDR " + hex(cpu.regs[5]) + "  BP " + hex(cpu.regs[7]), 120, 257);
+  text("Load Binary File", 60, 419);
+  text("Reset", 177, 419);
+  text("Cycles/F", 265, 420);
+  text("Status: " + (RUN_CPU?"Running":"Stoped"), 5, 442);
+  text("Clock: " + String.format("%.02f", SPEED_MHZ)+ " Mhz", 5, 457);
+  text("A " + hex(cpu.regs[0]) + " RES " + hex(cpu.regs[2]) + " MAR " + hex(cpu.regs[4]) + " CND " + hex(cpu.regs[6]) + " SP " + hex(cpu.regs[8]) + " AX " + hex(cpu.regs[10]) + " CX " + hex(cpu.regs[12]) + " EX " + hex(cpu.regs[14]), 115, 442);
+  text("B " + hex(cpu.regs[1]) + "  PC " + hex(cpu.regs[3]) + " MDR " + hex(cpu.regs[5]) + "  BP " + hex(cpu.regs[7]) + " CR " + hex(cpu.regs[9]) + " BX " + hex(cpu.regs[11]) + " DX " + hex(cpu.regs[13]) + " FX " + hex(cpu.regs[15]), 115, 457);
+  text("Current Instructions:", 513, 442);
+  text("[" + hex(cpu.regs[3]) + "] " + hex(cpu.instr) + " [+1] " + hex(cpu.ram[cpu.regs[3]+1]),513,457); 
   fill(0,255,0);
-  triangle(9, 209, 9, 221, 21, 215);
+  triangle(9, 409, 9, 421, 21, 415);
   fill(255,0,0);
-  rect(34,209,12,12);
+  rect(34,409,12,12);
   fill(0,0,255);
-  triangle(9+215, 209, 9+215, 221, 21+215, 215);
-  rect(19+215, 209, 2, 12);
+  triangle(9+215, 409, 9+215, 421, 21+215, 415);
+  rect(19+215, 409, 2, 12);
   
-  triangle(9+240, 209, 9+240, 221, 21+240, 215);
-  rect(19+240, 209, 2, 12);
+  triangle(9+240, 409, 9+240, 421, 21+240, 415);
+  rect(19+240, 409, 2, 12);
 }
 
 void drawScreen(){
   textFont(c16font);
   fill(0);
-  rect(0,0,320,200);
+  rect(0,0,640,400);
   for(int y = 0; y < 25; y++){
      for(int x = 0; x < 40; x++){
        char data = cpu.gfx_txt_mem[x+y*40];
@@ -387,10 +390,10 @@ void drawScreen(){
        
        //Block - Not in charset tty
        if(char_to_print == 0xdb){
-         rect(x*8,y*8,8,8);  
+         rect(x*16,y*16,16,16);  
        }
        else{
-         text(char_to_print,x*8,(y+1)*8);
+         text(char_to_print,x*16,(y+1)*16);
        }
      }
   }
@@ -408,35 +411,38 @@ boolean mbox(int x, int y, int w, int h){
 
 void mouseClicked(){
   //Run button
-  if(mbox(5, 205, 20, 20)){
+  if(mbox(5, 405, 20, 20)){
     RUN_CPU = true;
+    STEP = false;
     CYCLES_PER_FRAME = 1000000;
   }
   //Stop button
-  if(mbox(30, 205, 20, 20)){
+  if(mbox(30, 405, 20, 20)){
     RUN_CPU = false;
   }
   //Load Binary File button
-  if(mbox(55, 205, 110, 20)){
+  if(mbox(55, 405, 110, 20)){
     cpu.load_mem();
   }
   //Reset button
-  if(mbox(170, 205, 45, 20)){
+  if(mbox(170, 405, 45, 20)){
     cpu.reset(); 
     if(FILE_PATH != "" && FILE_PATH != "NULL"){
       cpu.load_mem_from_file(FILE_PATH); 
     }
   }
   //Step one cycle button
-  if(mbox(220, 205, 20, 20)){
+  if(mbox(220, 405, 20, 20)){
     RUN_CPU = true;
+    STEP = true;
     CYCLES_PER_FRAME = 1;
   }
-  //Step 1000 cycles button
-  if(mbox(245, 205, 70, 20)){
+  //Step setable number of cycles button
+  if(mbox(245, 405, 70, 20)){
     final String cycles = showInputDialog("Enter Cycles Per Frame");
     if(cycles != null){
       RUN_CPU = true;
+      STEP = false;
       CYCLES_PER_FRAME = int(cycles);
     }
   }
@@ -445,9 +451,9 @@ void mouseClicked(){
 void setup(){
   cpu = new CPU();
   ctrl_font = createFont("Courier", 10);
-  c16font = createFont("PxPlus_IBM_CGAthin.ttf", 8);
+  c16font = createFont("PxPlus_IBM_CGAthin.ttf", 16);
   noStroke();
-  size(320, 260);
+  size(640, 460);
   background(0);
   drawControls();
   if (args != null) {
@@ -465,6 +471,9 @@ void draw(){
     SPEED_MHZ = ((float)(cpu.clks))/(millis()-TIME_START);
     SPEED_MHZ /= 1000.0;
     cpu.clks = 0;
+    if(STEP){
+      RUN_CPU = false;  
+    }
   }
   drawControls();
   drawScreen();
