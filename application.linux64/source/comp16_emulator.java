@@ -468,6 +468,10 @@ public void setup(){
   
   background(0);
   drawControls();
+  if (args != null) {
+    FILE_PATH = args[0];
+    cpu.load_mem_from_file(FILE_PATH);
+  }
 }
 
 public void draw(){
