@@ -25,7 +25,7 @@ class ALU_OPS {
 }
 
 class INSTR {
-  static final int NOP=0, MOV=1, JMP=2, JPC=3, PRA=4, PRB=5, LOD=6, STR=7, PSH=8, POP=9, SRT=10, RET=11, OUT=12, IN=13;
+  static final int NOP=0, MOV=1, JMP=2, JPC=3, PRA=4, PRB=5, LOD=6, STR=7, PSH=8, POP=9, SRT=10, RET=11, OUT=12, IN=13, STK=14;
 }
 
 //Number of clocks for each instruction - used to find clock speed
@@ -237,6 +237,10 @@ class CPU {
         this.regs[src] = this.port_io[val];
         this.we[src] = true;
         break;
+      case INSTR.STK:
+	this.regs[REGS.MAR] = (char)(this.regs[REGS.SP] + val);
+	this.regs[REGS.MDR] = this.ram[this.regs[REGS.MAR]];
+	this.regs[src] = this.regs[this.regs[REGS.MDR]];
       default:
         break;
     }
