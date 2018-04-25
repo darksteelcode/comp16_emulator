@@ -240,7 +240,7 @@ class CPU {
       case INSTR.SKL:
 	      this.regs[REGS.MAR] = (char)(this.regs[REGS.SP] + val);
 	      this.regs[REGS.MDR] = this.ram[this.regs[REGS.MAR]];
-	      this.regs[src] = this.regs[this.regs[REGS.MDR]];
+	      this.regs[src] = this.regs[REGS.MDR];
         this.we[src] = true;
       case INSTR.SKS:
         this.regs[REGS.MAR] = (char)(this.regs[REGS.SP] + val);
