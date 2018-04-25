@@ -388,7 +388,8 @@ public void drawControls(){
   text("A " + hex(cpu.regs[0]) + " RES " + hex(cpu.regs[2]) + " MAR " + hex(cpu.regs[4]) + " CND " + hex(cpu.regs[6]) + " SP " + hex(cpu.regs[8]) + " AX " + hex(cpu.regs[10]) + " CX " + hex(cpu.regs[12]) + " EX " + hex(cpu.regs[14]), 115, 442);
   text("B " + hex(cpu.regs[1]) + "  PC " + hex(cpu.regs[3]) + " MDR " + hex(cpu.regs[5]) + "  BP " + hex(cpu.regs[7]) + " CR " + hex(cpu.regs[9]) + " BX " + hex(cpu.regs[11]) + " DX " + hex(cpu.regs[13]) + " FX " + hex(cpu.regs[15]), 115, 457);
   text("Current Instructions:", 513, 442);
-  text("[" + hex(cpu.regs[3]) + "] " + hex(cpu.instr) + " [+1] " + hex(cpu.ram[cpu.regs[3]+1]),513,457); 
+  text("[" + hex(cpu.regs[3]) + "] " + hex(cpu.instr) + " [+1] " + hex(cpu.ram[cpu.regs[3]+1]),513,457);
+  text("Port 0 IO:" + binary(cpu.port_io[0]), 320, 419); 
   fill(0,255,0);
   triangle(9, 409, 9, 421, 21, 415);
   fill(255,0,0);
