@@ -387,7 +387,7 @@ void drawControls(){
 void drawScreen(){
   textFont(c16font);
   fill(0);
-  rect(0,0,640,400);
+  rect(0,0,640,401);
   for(int y = 0; y < 25; y++){
      for(int x = 0; x < 40; x++){
        char data = cpu.gfx_txt_mem[x+y*40];
