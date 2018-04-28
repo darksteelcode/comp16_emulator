@@ -359,14 +359,13 @@ public void addKey(boolean release){
     keyCode += 32;  
   }
   //Set function keyCodes
-  if(keyCode>=112 && keyCode<=123){
+  else if(keyCode>=112 && keyCode<=123){
     keyCode = funcCodes[keyCode-112];
   }
   //Set arrow keyCodes
-  if(keyCode>=37 && keyCode <= 40){
+  else if(keyCode>=37 && keyCode <= 40){
      keyCode = arrowCodes[keyCode-37]; 
   }
-  println(keyCode);
   char code = (char)keyCode;
   //If it is a released key, add release code
   if(release){
