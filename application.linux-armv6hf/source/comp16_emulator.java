@@ -352,10 +352,21 @@ public void keyReleased(){
 }
 
 public void addKey(boolean release){
-   //Convert to lowercase
+  int[] funcCodes = {11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24, 25};
+  int[] arrowCodes = {28,29,30,31};
+   //Convert to lowercase for alphabet characters
   if(keyCode>=65&&keyCode<90){
     keyCode += 32;  
   }
+  //Set function keyCodes
+  if(keyCode>=112 && keyCode<=123){
+    keyCode = funcCodes[keyCode-112];
+  }
+  //Set arrow keyCodes
+  if(keyCode>=37 && keyCode <= 40){
+     keyCode = arrowCodes[keyCode-37]; 
+  }
+  println(keyCode);
   char code = (char)keyCode;
   //If it is a released key, add release code
   if(release){
