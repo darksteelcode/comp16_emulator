@@ -354,8 +354,13 @@ public void keyReleased(){
 public void addKey(boolean release){
   int[] funcCodes = {11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24, 25};
   int[] arrowCodes = {28,29,30,31};
+  //If delete, emulate it as esc because esc kills the window
+  println(keyCode);
+  if(keyCode == 127){
+    keyCode = 27;
+  }
   //Convert ` to proper ascii
-  if(keyCode == 192){
+  else if(keyCode == 192){
      keyCode = 96; 
   }
   //Convert ' to proper ascii
@@ -406,7 +411,7 @@ public void drawControls(){
   text("A " + hex(cpu.regs[0]) + " RES " + hex(cpu.regs[2]) + " MAR " + hex(cpu.regs[4]) + " CND " + hex(cpu.regs[6]) + " SP " + hex(cpu.regs[8]) + " AX " + hex(cpu.regs[10]) + " CX " + hex(cpu.regs[12]) + " EX " + hex(cpu.regs[14]), 115, 442);
   text("B " + hex(cpu.regs[1]) + "  PC " + hex(cpu.regs[3]) + " MDR " + hex(cpu.regs[5]) + "  BP " + hex(cpu.regs[7]) + " CR " + hex(cpu.regs[9]) + " BX " + hex(cpu.regs[11]) + " DX " + hex(cpu.regs[13]) + " FX " + hex(cpu.regs[15]), 115, 457);
   text("Current Instructions:", 513, 442);
-  text("[" + hex(cpu.regs[3]) + "] " + hex(cpu.instr) + " [+1] " + hex(cpu.ram[cpu.regs[3]+1]),513,457);
+  text("[" + hex(cpu.regs[3]) + "] " + hex(cpu.instr) + " [+1] " + hex(cpu.ram[(cpu.regs[3]+1)%0x10000]),513,457);
   text("Port 0 IO:" + binary(cpu.port_io[0]), 320, 419); 
   fill(0,255,0);
   triangle(9, 409, 9, 421, 21, 415);
