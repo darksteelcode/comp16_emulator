@@ -355,7 +355,6 @@ public void addKey(boolean release){
   int[] funcCodes = {11, 12, 13, 14, 15, 19, 20, 21, 22, 23, 24, 25};
   int[] arrowCodes = {28,29,30,31};
   //If delete, emulate it as esc because esc kills the window
-  println(keyCode);
   if(keyCode == 127){
     keyCode = 27;
   }
