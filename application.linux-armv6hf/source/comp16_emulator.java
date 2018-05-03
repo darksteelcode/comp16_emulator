@@ -47,7 +47,7 @@ class INSTR {
 }
 
 //Number of clocks for each instruction - used to find clock speed
-static final int[] INSTR_CLKS =  {2, 2, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 2, 2};
+static final int[] INSTR_CLKS =  {2, 2, 3, 3, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
 
 class CPU {
   char[] ram = new char[65536];
@@ -60,6 +60,9 @@ class CPU {
   char instr = 0;
   //Number of clock cycles run
   int clks = 0;
+  //Total number of clock cycles - used for time io ports - reset after hitting num for portio inc
+  long total_clks_ms = 0;
+  long total_clks_s = 0;
   
   //IO vars
   //GFX text
@@ -173,7 +176,10 @@ class CPU {
   public void run_instr(){
     char op = (char)((this.instr & 0xf000) >> 12);
     //add # of clks to clks
-    this.clks += INSTR_CLKS[op];
+    int clks = INSTR_CLKS[op];
+    this.clks += clks;
+    this.total_clks_ms += clks;
+    this.total_clks_s += clks;
     char src = (char)((this.instr & 0x0f00) >> 8);
     char dst = (char)((this.instr & 0x00f0) >> 4);
     byte alu_op = (byte)(this.instr & 0x000f);
@@ -292,6 +298,20 @@ class CPU {
         this.key_read_pos %=256;
      }
   }
+  //Set ports 9 and 10 to time based on total_clks
+  public void handle_time(){
+    //Set milliseconds
+    if(this.total_clks_ms > 50000){
+      this.port_io[9] += 1;
+      this.total_clks_ms = 0;
+    }
+    //Set seconds
+     if(this.total_clks_s > 50000000){
+      this.port_io[10] += 1;
+      this.total_clks_s = 0;
+    }
+    
+  }
   
   //Write data to ram if mdr was written to
   public void instr_end(){
@@ -300,6 +320,7 @@ class CPU {
     }
     this.handle_txt_mem();
     this.handle_key();
+    this.handle_time();
   }
   //Run one instr cycle
   public void run_instr_cycle(){
